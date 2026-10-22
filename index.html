@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Um jogo sobre informação e rotas para a gestão da roçada. Jogue sem apresentador."
+    />
+    <title>Você é o gestor • FIAP × Motiva</title>
+    <style>
+      :root {
+        --bg: #101e1b;
+        --panel: #1b2c27;
+        --ink: #f4f3df;
+        --muted: #adbbb1;
+        --lime: #d4f271;
+        --line: #3a4b40;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px system-ui,
+          sans-serif;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      header {
+        padding: 22px 4%;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .brand {
+        font-weight: 800;
+        letter-spacing: 2px;
+      }
+      .badge {
+        font-size: 11px;
+        letter-spacing: 1px;
+        border: 1px solid #68725a;
+        padding: 7px 12px;
+        border-radius: 30px;
+      }
+      main {
+        max-width: 1450px;
+        margin: auto;
+        padding: 28px 4%;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: end;
+      }
+      h1 {
+        font-size: clamp(32px, 4vw, 58px);
+        letter-spacing: -2px;
+        margin: 10px 0;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: var(--lime);
+        font-weight: 800;
+      }
+      .steps {
+        display: flex;
+        gap: 8px;
+        margin: 26px 0;
+      }
+      .step {
+        flex: 1;
+        border-top: 3px solid var(--line);
+        padding-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .step.active {
+        border-color: var(--lime);
+        color: var(--lime);
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 22px;
+      }
+      .map {
+        position: relative;
+        background: #21372e;
+        border: 1px solid #3d5243;
+        border-radius: 18px;
+        overflow: hidden;
+      }
+      .map svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .maptag {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: #c0cdb9;
+      }
+      .legend {
+        position: absolute;
+        bottom: 15px;
+        left: 20px;
+        display: flex;
+        gap: 13px;
+        font-size: 11px;
+        color: #c3cdbd;
+      }
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 24px;
+      }
+      h2 {
+        font-size: 24px;
+        margin: 12px 0;
+      }
+      .primary,
+      .secondary {
+        border: 0;
+        border-radius: 9px;
+        padding: 14px 18px;
+        font-weight: 750;
+      }
+      .primary {
+        background: var(--lime);
+        color: #18251b;
+      }
+      .secondary {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid #55634d;
+      }
+      .wide {
+        width: 100%;
+        margin-top: 14px;
+      }
+      .metrics {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        padding: 14px 0;
+        font-size: 14px;
+      }
+      .metrics strong {
+        font-size: 18px;
+      }
+      .flow {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 24px 0 10px;
+      }
+      .flow span {
+        font-size: 11px;
+        color: var(--muted);
+        padding: 10px 3px;
+        border-bottom: 2px solid var(--line);
+      }
+      .flow span.on {
+        color: var(--lime);
+        border-color: var(--lime);
+      }
+      .note {
+        font-size: 12px;
+      }
+      .choices {
+        display: grid;
+        gap: 8px;
+      }
+      .choice {
+        padding: 12px;
+        background: #263b30;
+        border: 1px solid #4c5d47;
+        color: var(--ink);
+        border-radius: 8px;
+        text-align: left;
+      }
+      .choice.selected {
+        border-color: var(--lime);
+        color: var(--lime);
+      }
+      .route {
+        font-size: 15px;
+        line-height: 2;
+        color: var(--lime);
+      }
+      .bottom {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+        margin-top: 20px;
+      }
+      .fact {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .fact b {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 14px;
+      }
+      .fact span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      td,
+      th {
+        text-align: left;
+        padding: 10px 4px;
+        border-bottom: 1px solid var(--line);
+      }
+      th:last-child,
+      td:last-child {
+        color: var(--lime);
+      }
+      .node {
+        cursor: pointer;
+        outline: none;
+      }
+      .node:focus circle,
+      .node:hover circle {
+        stroke: white;
+        stroke-width: 4;
+      }
+      .base {
+        cursor: pointer;
+      }
+      .base:focus rect,
+      .base:hover rect {
+        stroke: white;
+        stroke-width: 3;
+      }
+      #routeLine {
+        stroke-dasharray: 12 8;
+        animation: travel 1s linear infinite;
+      }
+      @keyframes travel {
+        to {
+          stroke-dashoffset: -40;
+        }
+      }
+      dialog {
+        background: var(--panel);
+        color: var(--ink);
+        border: 1px solid #637452;
+        border-radius: 16px;
+        max-width: 700px;
+        padding: 32px;
+      }
+      dialog::backdrop {
+        background: #000a;
+      }
+      dialog p {
+        font-size: 14px;
+      }
+      .reset {
+        color: var(--muted);
+        background: none;
+        border: 0;
+        font-size: 12px;
+      }
+      #status {
+        min-height: 45px;
+      }
+      .pulse {
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        50% {
+          opacity: 0.35;
+        }
+      }
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .bottom {
+          grid-template-columns: 1fr;
+        }
+        .top {
+          display: block;
+        }
+        .map {
+          min-height: 330px;
+        }
+        .map svg {
+          min-height: 330px;
+        }
+        .badge {
+          font-size: 9px;
+        }
+        header {
+          gap: 12px;
+        }
+        .legend {
+          gap: 7px;
+          font-size: 9px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+        }
+      }
+      .layout {
+        grid-template-columns: 1fr 380px;
+      }
+      .choices {
+        grid-template-columns: 1fr 1fr;
+      }
+      .bases {
+        grid-template-columns: repeat(3, 1fr);
+        margin: 10px 0;
+      }
+      .bases:has(button:nth-child(2):last-child) {
+        grid-template-columns: 1fr 1fr;
+      }
+      .panel p {
+        font-size: 14px;
+      }
+      .panel h2 {
+        font-size: 27px;
+      }
+      label {
+        font-size: 13px;
+      }
+      details {
+        color: var(--muted);
+        margin-top: 20px;
+      }
+      summary {
+        cursor: pointer;
+      }
+      @media (max-width: 1000px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .map svg {
+          min-height: 300px;
+        }
+        .flow span {
+          font-size: 9px;
+        }
+        .panel h2 {
+          font-size: 25px;
+        }
+      }
+      /* Event mode: one action at a time, large touch targets. */
+      main {
+        padding-top: 18px;
+      }
+      .top h1 {
+        font-size: 40px;
+        margin: 6px 0;
+        letter-spacing: -1.5px;
+      }
+      .top p {
+        margin: 4px 0;
+        font-size: 16px;
+      }
+      .top .eyebrow {
+        display: none;
+      }
+      .steps {
+        margin: 18px 0;
+      }
+      .panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 410px;
+        padding: 26px;
+      }
+      .panel h2 {
+        font-size: 30px;
+        line-height: 1.18;
+        letter-spacing: -0.7px;
+      }
+      .panel p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 12px 0;
+      }
+      .panel .note {
+        font-size: 13px;
+      }
+      .primary {
+        min-height: 58px;
+        font-size: 18px;
+        box-shadow: 0 4px 0 #829641;
+        transition: transform 0.15s;
+      }
+      .primary:not(:disabled):hover {
+        transform: translateY(-2px);
+        filter: brightness(1.07);
+      }
+      .primary:disabled {
+        box-shadow: none;
+      }
+      .hero-symbol {
+        font-size: 44px;
+        color: var(--lime);
+        margin: 12px 0;
+      }
+      .counter {
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--lime);
+        margin: 12px 0;
+      }
+      .counter small {
+        font-size: 16px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .slots {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .slot {
+        border: 1px dashed #718163;
+        border-radius: 8px;
+        padding: 11px 9px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .slot.filled {
+        color: var(--ink);
+        border-style: solid;
+        background: #304635;
+      }
+      .panel .hint {
+        font-size: 14px;
+        color: var(--lime);
+      }
+      .tools {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .bases .choice {
+        min-height: 54px;
+        text-align: center;
+        font-size: 16px;
+      }
+      .scoreboard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 15px 0;
+      }
+      .scoreboard > div {
+        background: #263b30;
+        border-radius: 12px;
+        padding: 18px 12px;
+      }
+      .scoreboard > div:last-child {
+        border: 1px solid var(--lime);
+      }
+      .scoreboard span {
+        display: block;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .scoreboard b {
+        font-size: 38px;
+        display: block;
+        margin-top: 8px;
+      }
+      .scoreboard small {
+        font-size: 15px;
+      }
+      .scoreboard > div:last-child b,
+      .success {
+        color: var(--lime);
+      }
+      .panel .success {
+        font-size: 19px;
+        font-weight: 750;
+      }
+      .takeaway {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 10px 0;
+      }
+      .takeaway > span {
+        font-size: 28px;
+      }
+      .takeaway p {
+        margin: 2px 0 !important;
+      }
+      .flow[hidden],
+      #status:empty {
+        display: none;
+      }
+      .flow {
+        background: var(--panel);
+        padding: 14px;
+        border-radius: 12px;
+      }
+      .flow span {
+        font-size: 15px;
+      }
+      #status {
+        margin: 10px 0;
+        min-height: 0;
+        color: var(--lime);
+        font-size: 15px;
+      }
+      .node:not(.target),
+      .base:not(.target) {
+        cursor: default;
+      }
+      .node.target circle:first-child {
+        stroke: #d4f271;
+        stroke-width: 3;
+        filter: drop-shadow(0 0 6px #d4f27555);
+      }
+      .base.target rect {
+        stroke: #d4f271;
+        stroke-width: 3;
+      }
+      .node.target:hover circle:first-child,
+      .node.target:focus circle:first-child {
+        stroke: #fff;
+        stroke-width: 6;
+      }
+      .base.target:hover rect,
+      .base.target:focus rect {
+        stroke: #fff;
+        stroke-width: 5;
+      }
+      .node.target,
+      .base.target {
+        cursor: pointer;
+      }
+      .base:not(.target) {
+        opacity: 0.65;
+      }
+      .node:focus-visible,
+      .base:focus-visible {
+        outline: none;
+      }
+      button:focus-visible {
+        outline: 3px solid white;
+        outline-offset: 4px;
+      }
+      footer {
+        margin-top: 16px;
+      }
+      details {
+        margin-top: 12px;
+      }
+      .map {
+        align-self: start;
+      }
+      @media (max-width: 1000px) {
+        .layout {
+          display: flex;
+          flex-direction: column;
+        }
+        .panel {
+          order: -1;
+          min-height: 0;
+          padding: 22px;
+        }
+        .map {
+          width: 100%;
+        }
+        .panel h2 {
+          font-size: 27px;
+        }
+        .hero-symbol {
+          font-size: 32px;
+          margin: 4px 0;
+        }
+        .counter {
+          margin: 6px 0;
+          font-size: 38px;
+        }
+        .top h1 {
+          font-size: 32px;
+        }
+        .top > .badge {
+          display: none;
+        }
+        .flow {
+          flex-wrap: wrap;
+        }
+        .flow span {
+          font-size: 12px;
+        }
+        .steps {
+          gap: 4px;
+        }
+        .step {
+          font-size: 10px;
+        }
+        .primary {
+          min-height: 54px;
+        }
+        .panel .wide {
+          margin-top: 10px;
+        }
+      }
+      .base.starting-base {
+        opacity: 1;
+      }
+      .base.starting-base rect {
+        stroke: #f4f3df;
+        stroke-width: 3;
+        filter: drop-shadow(0 0 9px #d4f27580);
+      }
+      .departure {
+        padding: 10px 12px;
+        margin: 5px 0 12px;
+        border-left: 3px solid var(--lime);
+        background: #293d2e;
+        color: var(--lime);
+        font-size: 15px;
+        border-radius: 0 8px 8px 0;
+      }
+      .start-marker {
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        FIAP <span style="color: var(--lime)">×</span> MOTIVA
+      </div>
+      <span class="badge">JOGO EDUCATIVO · CENÁRIO SIMULADO</span>
+    </header>
+    <main>
+      <div class="top">
+        <div>
+          <span class="eyebrow"
+            >SEIS TRECHOS. UMA EQUIPE. MENOS DESLOCAMENTO.</span
+          >
+          <h1>Você é o gestor.</h1>
+          <p id="intro">Encontre onde roçar. Escolha o menor caminho.</p>
+        </div>
+        <span class="badge">TOQUE PARA JOGAR · ~2 MIN</span>
+      </div>
+      <nav class="steps" aria-label="Progresso">
+        <div class="step">01 / O problema</div>
+        <div class="step">02 / A descoberta</div>
+        <div class="step">03 / Seu caminho</div>
+        <div class="step">04 / A solução</div>
+      </nav>
+      <div class="layout">
+        <section class="map" aria-label="Mapa do jogo">
+          <div class="maptag">RODOVIA EXPERIMENTAL / 6 TRECHOS</div>
+          <svg
+            viewBox="0 0 900 540"
+            aria-label="Seis trechos conectados, com distâncias fictícias em quilômetros"
+          >
+            <defs>
+              <pattern
+                id="grid"
+                width="44"
+                height="44"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M44 0H0V44"
+                  fill="none"
+                  stroke="#67815c"
+                  stroke-opacity=".1"
+                />
+              </pattern>
+            </defs>
+            <rect width="900" height="540" fill="url(#grid)" />
+            <path
+              d="M0 410Q180 290 140 0M580 540Q650 380 900 350"
+              fill="none"
+              stroke="#354d39"
+              stroke-width="80"
+            />
+            <path
+              d="M0 440Q260 400 370 540"
+              fill="none"
+              stroke="#53736a"
+              stroke-width="12"
+              opacity=".5"
+            />
+            <path
+              d="M100 270L235 200L375 285L520 210L665 290L805 210M195 90L235 200M430 430L375 285M785 420L805 210"
+              fill="none"
+              stroke="#101e1b"
+              stroke-width="27"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M100 270L235 200L375 285L520 210L665 290L805 210M195 90L235 200M430 430L375 285M785 420L805 210"
+              fill="none"
+              stroke="#73816a"
+              stroke-width="2"
+              stroke-dasharray="7 9"
+            />
+            <g fill="#e3e9d8" font-size="12" text-anchor="middle">
+              <text x="165" y="220">8 km</text>
+              <text x="305" y="230">9 km</text>
+              <text x="450" y="235">7 km</text>
+              <text x="592" y="238">6 km</text>
+              <text x="740" y="236">8 km</text>
+              <text x="248" y="137">5 km</text>
+              <text x="436" y="365">4 km</text>
+              <text x="835" y="365">6 km</text>
+            </g>
+            <path
+              id="routeLine"
+              fill="none"
+              stroke="#d4f271"
+              stroke-width="6"
+              stroke-linecap="round"
+            />
+            <g id="nodes"></g>
+            <g id="bases"></g>
+            <text x="35" y="475" fill="#9aaf98" font-size="11">
+              DISTÂNCIAS FICTÍCIAS · PERCURSO SEM RETORNO À BASE
+            </text>
+          </svg>
+          <div class="legend">
+            <span><i class="dot" style="background: #7fd7a2"></i>Normal</span
+            ><span><i class="dot" style="background: #efd575"></i>Atenção</span
+            ><span><i class="dot" style="background: #efa46b"></i>Alto</span
+            ><span><i class="dot" style="background: #f77d7b"></i>Crítico</span>
+          </div>
+        </section>
+        <aside class="panel" id="panel" aria-live="polite"></aside>
+      </div>
+      <div class="flow" aria-label="Como os dados chegam">
+        <span>🌱 Sensor</span><span>↗ LoRa</span><span>📡 Proxy</span
+        ><span>▦ Plataforma</span>
+      </div>
+      <p class="note" id="status" aria-live="polite"></p>
+      <footer>
+        <span>FIAP × Motiva · Simulação educativa</span
+        ><button class="reset" onclick="reset()">↻ Recomeçar</button>
+      </footer>
+      <details class="note">
+        <summary>Sobre esta simulação</summary>
+        <p>
+          Mapa, índices, limites e distâncias são fictícios. O percentual
+          representa um índice ilustrativo de vegetação, não altura em
+          centímetros. Neste jogo, índice ≥40% indica necessidade de roçada. A
+          classificação descreve a vegetação, mas não impõe ordem de
+          atendimento. A recomendação avalia todas as 24 ordens possíveis dos
+          quatro trechos necessários, a partir da base escolhida, e minimiza a
+          distância. Não inclui trânsito, tempo de serviço ou retorno à base.
+          Passar por um ponto não conta como executar a roçada. Não há conexão
+          com sensores, equipamentos ou a plataforma real do grupo.
+        </p>
+      </details>
+    </main>
+    <script>
+      const segments = [
+        {
+          km: 10,
+          x: 100,
+          y: 270,
+          value: 24,
+          color: "#7fd7a2",
+          label: "Normal",
+        },
+        {
+          km: 20,
+          x: 235,
+          y: 200,
+          value: 51,
+          color: "#efd575",
+          label: "Atenção",
+        },
+        {
+          km: 30,
+          x: 375,
+          y: 285,
+          value: 87,
+          color: "#f77d7b",
+          label: "Crítico",
+        },
+        { km: 40, x: 520, y: 210, value: 72, color: "#efa46b", label: "Alto" },
+        {
+          km: 50,
+          x: 665,
+          y: 290,
+          value: 28,
+          color: "#7fd7a2",
+          label: "Normal",
+        },
+        { km: 60, x: 805, y: 210, value: 66, color: "#efa46b", label: "Alto" },
+      ];
+      const bases = [
+        { name: "Norte", x: 195, y: 90, node: 1, link: 5 },
+        { name: "Central", x: 430, y: 430, node: 2, link: 4 },
+        { name: "Sul", x: 785, y: 420, node: 5, link: 6 },
+      ];
+      const edges = [8, 9, 7, 6, 8],
+        required = segments
+          .map((s, i) => i)
+          .filter((i) => segments[i].value >= 40);
+      let stage = 0,
+        base = 1,
+        blind = [],
+        manual = [],
+        busy = false,
+        baseConfirmed = false,
+        version = 0,
+        selected = 2,
+        view = "system";
+      const $ = (s) => document.querySelector(s),
+        dist = (a, b) =>
+          edges
+            .slice(Math.min(a, b), Math.max(a, b))
+            .reduce((a, b) => a + b, 0);
+      function length(order, b = base) {
+        let p = bases[b].node,
+          d = bases[b].link;
+        for (const i of order) {
+          d += dist(p, i);
+          p = i;
+        }
+        return d;
+      }
+      function permutations(a) {
+        return a.length
+          ? a.flatMap((n, i) =>
+              permutations(a.filter((_, j) => i !== j)).map((t) => [n, ...t]),
+            )
+          : [[]];
+      }
+      function recommendation() {
+        return permutations(required).sort((a, b) => length(a) - length(b))[0];
+      }
+      function path(order) {
+        let b = bases[base],
+          p = b.node,
+          points = [`${b.x},${b.y}`, `${segments[p].x},${segments[p].y}`];
+        for (const i of order) {
+          if (i !== p) {
+            let dir = i > p ? 1 : -1;
+            for (let j = p + dir; dir > 0 ? j <= i : j >= i; j += dir)
+              points.push(`${segments[j].x},${segments[j].y}`);
+          }
+          p = i;
+        }
+        return "M" + points.join("L");
+      }
+      const names = (a) => a.map((i) => "KM " + segments[i].km).join(" → ");
+      function draw() {
+        const reveal = stage >= 2;
+        $(".flow").hidden = !busy;
+        const picking = stage === 1 || (stage === 3 && baseConfirmed);
+        $(".map").classList.toggle("picking", picking);
+        $(".map").classList.toggle(
+          "picking-base",
+          stage === 3 && !baseConfirmed,
+        );
+        $("#nodes").innerHTML = segments
+          .map((s, i) => {
+            const order =
+              stage === 1
+                ? blind
+                : stage >= 4
+                  ? stage === 4 && view === "manual"
+                    ? manual
+                    : recommendation()
+                  : stage === 3
+                    ? manual
+                    : [];
+            const pos = order.indexOf(i);
+            return `<g class="node ${picking && (stage === 1 || required.includes(i)) ? "target" : ""}" tabindex="${picking && (stage === 1 || required.includes(i)) ? 0 : -1}" role="button" aria-disabled="${!picking || (stage === 3 && !required.includes(i))}" aria-label="KM ${s.km}${reveal ? ", " + s.label + ", " + s.value + "%" : ""}" onclick="inspect(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();inspect(${i})}"><circle cx="${s.x}" cy="${s.y}" r="23" fill="${reveal ? s.color : "#667b65"}" stroke="${pos >= 0 ? "#fff" : "#21372e"}" stroke-width="${pos >= 0 ? 4 : 7}"/>${pos >= 0 ? `<circle cx="${s.x + 20}" cy="${s.y - 22}" r="13" fill="#f4f3df"/><text x="${s.x + 20}" y="${s.y - 17}" text-anchor="middle" fill="#101e1b" font-size="14" font-weight="900">${pos + 1}</text>` : ""}<text x="${s.x}" y="${s.y + 5}" text-anchor="middle" fill="#17251c" font-size="12" font-weight="800">${reveal ? s.value + "%" : "?"}</text><text x="${s.x}" y="${s.y + 46}" text-anchor="middle" fill="#f4f3df" font-size="14" font-weight="700">KM ${s.km}</text><text x="${s.x}" y="${s.y + 65}" text-anchor="middle" fill="${reveal ? s.color : "#aab8a4"}" font-size="11">${pos >= 0 ? pos + 1 + "ª parada" : reveal ? s.label : "Sem informação"}</text></g>`;
+          })
+          .join("");
+        $("#bases").innerHTML = bases
+          .map(
+            (b, i) =>
+              `<g class="base ${stage === 1 && i === 1 ? "starting-base" : ""} ${stage === 3 && !baseConfirmed ? "target" : ""}" tabindex="${stage === 3 && !baseConfirmed ? 0 : -1}" role="button" aria-disabled="${stage !== 3 || baseConfirmed}" aria-label="Base ${b.name}${stage === 1 && i === 1 ? ", saída da primeira tentativa" : ""}" onclick="chooseBase(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();chooseBase(${i})}"><rect x="${b.x - 58}" y="${b.y - 18}" width="116" height="36" rx="8" fill="${base === i ? "#d4f271" : "#1a2b23"}" stroke="#718163"/><text x="${b.x}" y="${b.y + 5}" text-anchor="middle" font-size="12" font-weight="700" fill="${base === i ? "#17251c" : "#e3e9d8"}">BASE ${b.name.toUpperCase()}</text>${stage === 1 && i === 1 ? `<g class="start-marker" pointer-events="none"><rect x="${b.x - 68}" y="${b.y + 28}" width="136" height="30" rx="15" fill="#d4f271"/><text x="${b.x}" y="${b.y + 48}" text-anchor="middle" fill="#101e1b" font-size="13" font-weight="900">SAÍDA DA EQUIPE</text></g>` : ""}</g>`,
+          )
+          .join("");
+        document
+          .querySelectorAll(".step")
+          .forEach((e, i) =>
+            e.classList.toggle(
+              "active",
+              i <= (stage <= 1 ? 0 : stage === 2 ? 1 : stage === 3 ? 2 : 3),
+            ),
+          );
+      }
+      function choiceList(indices, order, fn) {
+        return `<div class="choices">${indices.map((i) => `<button class="choice ${order.includes(i) ? "selected" : ""}" onclick="${fn}(${i})">${order.includes(i) ? order.indexOf(i) + 1 + "º · " : ""}KM ${segments[i].km}${stage >= 2 ? " · " + segments[i].label : ""}</button>`).join("")}</div>`;
+      }
+      function baseList() {
+        return `<div class="choices bases">${bases.map((b, i) => `<button class="choice ${base === i ? "selected" : ""}" onclick="chooseBase(${i})">${b.name}</button>`).join("")}</div>`;
+      }
+      function setStatus(s) {
+        $("#status").innerHTML = s;
+      }
+      function render() {
+        draw();
+        let h = "";
+        if (stage === 0) {
+          h = `<h2>Onde roçar?<br>Por onde ir?</h2><p>6 trechos. Uma equipe.<br>Descubra onde agir e evite voltas.</p><button class="primary wide" onclick="start()">▶ Começar</button>`;
+          setStatus("");
+        }
+        if (stage === 1) {
+          h = `<span class="eyebrow">1 / SEM DADOS</span><h2>Toque em 3 pontos<br>no mapa.</h2><p>Sem sensores, você precisa procurar.</p><div class="departure">Saída: <b>Base Central</b></div><div class="counter">${blind.length}<small> / 3 escolhidos</small></div><div class="slots">${[0, 1, 2].map((_, n) => `<span class="slot ${blind[n] !== undefined ? "filled" : ""}">${blind[n] !== undefined ? "KM " + segments[blind[n]].km : n + 1 + "º · ?"}</span>`).join("")}</div><p class="hint">${blind.length < 3 ? "☝ Toque nos círculos com “?”." : "✓ Pronto! Veja o que encontrou."}</p><button class="primary wide" ${blind.length !== 3 ? "disabled" : ""} onclick="inspectBlind()">Ver resultado →</button>`;
+          setStatus("");
+        }
+        if (stage === 2) {
+          const useful = blind.filter((i) => required.includes(i)).length,
+            missed = required.length - useful;
+          h = busy
+            ? `<span class="eyebrow">RECEBENDO DADOS</span><h2>Do campo<br>até você.</h2><div class="hero-symbol pulse">📡</div><p id="transmission" role="status">Sensor mede a vegetação.</p>`
+            : `<span class="eyebrow">O PROBLEMA</span><h2>Ainda faltou<br>onde roçar.</h2><div class="counter">${missed}<small> trecho${missed === 1 ? " ficou" : "s ficaram"} de fora</small></div><p>Você encontrou ${useful} dos 4 necessários.<br>E se soubesse onde ir antes de sair?</p><button class="primary wide" onclick="updateSensors()">📡 Revelar com sensores</button>`;
+          setStatus("");
+        }
+        if (stage === 3 && !baseConfirmed) {
+          h = `<span class="eyebrow">2 / COM DADOS</span><h2>Escolha sua base.</h2><p>Os sensores localizaram os 4 trechos.<br>De onde sua equipe vai sair?</p>${baseList()}<p class="hint">☝ Toque em uma base.</p><button class="primary wide" onclick="confirmBase()">Sair da Base ${bases[base].name} →</button>`;
+          setStatus("");
+        }
+        if (stage === 3 && baseConfirmed) {
+          h = `<span class="eyebrow">3 / MONTE O CAMINHO</span><h2>Toque nos 4 trechos<br>na ordem de visita.</h2><p>Objetivo: percorrer menos quilômetros.</p><div class="counter">${manual.length ? length(manual) : "—"}<small> km · ${manual.length}/4 paradas</small></div><div class="slots">${[0, 1, 2, 3].map((_, n) => `<span class="slot ${manual[n] !== undefined ? "filled" : ""}">${manual[n] !== undefined ? "KM " + segments[manual[n]].km : n + 1 + "º · ?"}</span>`).join("")}</div><p class="hint">${manual.length < 4 ? "☝ Toque nos círculos coloridos." : "✓ Caminho completo. Vamos comparar!"}</p><button class="primary wide" ${manual.length !== 4 ? "disabled" : ""} onclick="compare()">Comparar rota →</button><div class="tools"><button class="reset" onclick="clearRoute()">↶ Limpar</button><button class="reset" onclick="baseConfirmed=false;manual=[];render();showPath([])">Trocar base</button></div>`;
+          setStatus("");
+        }
+        if (stage === 4) {
+          const best = recommendation(),
+            mine = length(manual),
+            opt = length(best),
+            saving = mine - opt;
+          h = `<span class="eyebrow">4 / COMPARE</span><h2>${saving ? "Menos voltas.<br>Mesmo atendimento." : "Você acertou<br>o menor caminho!"}</h2><div class="scoreboard"><div><span>Sua rota</span><b>${mine}<small> km</small></b></div><div><span>Menor rota</span><b>${opt}<small> km</small></b></div></div><p class="success">${saving ? "↓ " + saving + " km a menos" : "✓ Melhor distância encontrada"}</p><p class="note">As duas atendem os mesmos 4 trechos.</p><div class="choices bases"><button class="choice ${view === "manual" ? "selected" : ""}" onclick="showRoute('manual')">Sua rota</button><button class="choice ${view === "system" ? "selected" : ""}" onclick="showRoute('system')">Menor rota</button></div><p class="hint">☝ Alterne para ver o caminho no mapa.</p><button class="primary wide" onclick="finish()">Concluir →</button><button class="reset wide" onclick="stage=3;baseConfirmed=true;render();showPath(manual)">Tentar outra ordem</button>`;
+          setStatus("");
+        }
+        if (stage === 5) {
+          const saving = length(manual) - length(recommendation());
+          h = `<span class="eyebrow">MISSÃO CUMPRIDA</span><div class="hero-symbol">✓</div><h2>Dados para agir.<br>Rotas para poupar.</h2><div class="takeaway"><span>🌱</span><div><b>Sensores</b><p>Mostram onde roçar.</p></div></div><div class="takeaway"><span>↗</span><div><b>Planejamento</b><p>Encontra o menor caminho.</p></div></div><p class="success">4 trechos atendidos${saving ? " · " + saving + " km poupados" : ""}</p><button class="primary wide" onclick="reset()">↻ Jogar novamente</button>`;
+          setStatus("");
+        }
+        $("#panel").innerHTML = h;
+      }
+      function confirmBase() {
+        if (stage !== 3) return;
+        baseConfirmed = true;
+        render();
+      }
+      function showPath(order) {
+        $("#routeLine").setAttribute("d", order.length ? path(order) : "");
+      }
+      function start() {
+        if (stage !== 0) return;
+        stage = 1;
+        render();
+      }
+      function pickBlind(i) {
+        if (stage !== 1) return;
+        if (blind.includes(i)) blind = blind.filter((x) => x !== i);
+        else if (blind.length < 3) blind.push(i);
+        else {
+          setStatus("Toque em um ponto escolhido para trocar.");
+          return;
+        }
+        render();
+        showPath(blind);
+      }
+      function inspectBlind() {
+        if (stage !== 1 || blind.length !== 3) return;
+        stage = 2;
+        showPath(blind);
+        render();
+        setStatus("");
+      }
+      async function updateSensors() {
+        if (stage !== 2 || busy) return;
+        busy = true;
+        render();
+        const token = version;
+        const flow = [...document.querySelectorAll(".flow span")],
+          messages = [
+            "🌱 Sensor mede a vegetação.",
+            "↗ LoRa transmite a medição.",
+            "📡 Proxy encaminha os dados.",
+            "✓ Plataforma mostra onde roçar.",
+          ];
+        for (let i = 0; i < 4; i++) {
+          if (token !== version) return;
+          flow[i].classList.add("on");
+          $("#transmission").textContent = messages[i];
+          await new Promise((r) => setTimeout(r, 1200));
+        }
+        if (token !== version) return;
+        busy = false;
+        stage = 3;
+        baseConfirmed = false;
+        showPath([]);
+        render();
+      }
+      function inspect(i) {
+        if (stage === 1) pickBlind(i);
+        else if (stage === 3 && baseConfirmed) {
+          if (required.includes(i)) pick(i);
+          else setStatus("Trecho normal: não precisa de roçada.");
+        }
+      }
+      function chooseBase(i) {
+        if (stage !== 3 || baseConfirmed) return;
+        base = i;
+        render();
+        showPath(manual);
+      }
+      function pick(i) {
+        if (stage !== 3 || !baseConfirmed || !required.includes(i)) return;
+        manual = manual.includes(i)
+          ? manual.filter((x) => x !== i)
+          : [...manual, i];
+        render();
+        showPath(manual);
+      }
+      function clearRoute() {
+        if (stage !== 3) return;
+        manual = [];
+        render();
+        showPath([]);
+      }
+      function compare() {
+        if (stage !== 3 || manual.length !== required.length) return;
+        stage = 4;
+        view = "system";
+        render();
+        showPath(recommendation());
+      }
+      function showRoute(v) {
+        if (stage !== 4) return;
+        view = v;
+        render();
+        showPath(v === "manual" ? manual : recommendation());
+      }
+      function finish() {
+        if (stage !== 4) return;
+        stage = 5;
+        render();
+        showPath(recommendation());
+      }
+      function reset() {
+        version++;
+        busy = false;
+        baseConfirmed = false;
+        stage = 0;
+        base = 1;
+        blind = [];
+        manual = [];
+        view = "system";
+        document
+          .querySelectorAll(".flow span")
+          .forEach((e) => e.classList.remove("on"));
+        showPath([]);
+        render();
+      }
+      render();
+    </script>
+  </body>
+</html>
